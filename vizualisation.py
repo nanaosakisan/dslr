@@ -24,14 +24,43 @@ def scatter_plot(sub_dataset):
         data=sub_dataset[1]
         dataframe = data[1][1:]
         st.dataframe(dataframe)
-        fig = px.scatter(x=dataframe)
-        st.write(fig)
+        # fig = px.scatter(x=dataframe)
+        # st.write(fig)
         # for i, data in enumerate(sub_dataset) :
         #     name = "fig_" + str(i)
         #     dataframe = data[1]
         #     name = px.scatter(x = dataframe[0], y = dataframe[0], title=data[0])
         #     st.write(name)
 
+def pair_plot(dataset) :
+    st.markdown("## Pair plot")
+    col = [1] + list(range(6, 19))
+    features = list(range(1,14))
+    name = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", \
+        "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", \
+        "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
+    sub_data = [[l[i] for i in col] for l in dataset]
+
+    if st.checkbox("Voir les pair plots"):
+        fig_pair = px.scatter_matrix(sub_data[1:], dimensions=features, color=0, \
+            labels=name)
+        fig_pair.update_traces(diagonal_visible=False, showupperhalf=False)
+        st.dataframe(sub_data)
+        st.write(fig_pair)
+
+
+    # fig = px.scatter_matrix(df,
+    # dimensions=["sepal_width", "sepal_length", "petal_width", "petal_length"],
+    # color="species", symbol="species",
+    # title="Scatter matrix of iris data set",
+    # labels={col:col.replace('_', ' ') for col in df.columns}) # remove underscore
+    # fig.update_traces(diagonal_visible=False)
+
+ 
+    # data = sub_dataset[1][1]
+    # st.dataframe(data)
+    # fig = px.scatter_matrix(sub_dataset)
+    # st.write(fig)
 
 def vizualisation(dataset):
     sub_dataset = []
@@ -51,3 +80,4 @@ def vizualisation(dataset):
 
     histogram(sub_dataset)
     scatter_plot(sub_dataset)
+    pair_plot(dataset)
