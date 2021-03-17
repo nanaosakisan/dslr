@@ -3,6 +3,7 @@ import streamlit as st
 from parse import parse_train
 from describe import describe
 from vizualisation import vizualisation
+from logreg_train import logreg_train
 
 st.title("DSLR")
 
@@ -19,6 +20,8 @@ if filename :
         des = describe(dataset)
         st.dataframe(des)
         vizualisation(dataset)
+
+        logreg_train(dataset)
     else:
         st.write(error)
         

@@ -9,60 +9,7 @@ def sub_data(dataset, col_grade):
         sub_data.append(push)
     return sub_data
 
-def histogram(sub_dataset):
-    st.markdown("## Histogramme")
-    if st.checkbox("Voir les histogrammes"):
-        for i, data in enumerate(sub_dataset) :
-            name = "fig_" + str(i)
-            dataframe = data[1]
-            name = px.histogram(dataframe[1:], color=1, marginal="violin", title=data[0])
-            st.write(name)
-
-def scatter_plot(sub_dataset):
-    st.markdown("## Scatter plot")
-    if st.checkbox("Voir les scatter plot"):
-        data=sub_dataset[1]
-        dataframe = data[1][1:]
-        st.dataframe(dataframe)
-        # fig = px.scatter(x=dataframe)
-        # st.write(fig)
-        # for i, data in enumerate(sub_dataset) :
-        #     name = "fig_" + str(i)
-        #     dataframe = data[1]
-        #     name = px.scatter(x = dataframe[0], y = dataframe[0], title=data[0])
-        #     st.write(name)
-
-def pair_plot(dataset) :
-    st.markdown("## Pair plot")
-    col = [1] + list(range(6, 19))
-    features = list(range(1,14))
-    name = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", \
-        "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", \
-        "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
-    sub_data = [[l[i] for i in col] for l in dataset]
-
-    if st.checkbox("Voir les pair plots"):
-        fig_pair = px.scatter_matrix(sub_data[1:], dimensions=features, color=0, \
-            labels=name)
-        fig_pair.update_traces(diagonal_visible=False, showupperhalf=False)
-        st.dataframe(sub_data)
-        st.write(fig_pair)
-
-
-    # fig = px.scatter_matrix(df,
-    # dimensions=["sepal_width", "sepal_length", "petal_width", "petal_length"],
-    # color="species", symbol="species",
-    # title="Scatter matrix of iris data set",
-    # labels={col:col.replace('_', ' ') for col in df.columns}) # remove underscore
-    # fig.update_traces(diagonal_visible=False)
-
- 
-    # data = sub_dataset[1][1]
-    # st.dataframe(data)
-    # fig = px.scatter_matrix(sub_dataset)
-    # st.write(fig)
-
-def vizualisation(dataset):
+def histogram(dataset):
     sub_dataset = []
     sub_dataset.append(["Arithmancy", sub_data(dataset, 6)])
     sub_dataset.append(["Astronomy", sub_data(dataset, 7)])
@@ -78,6 +25,45 @@ def vizualisation(dataset):
     sub_dataset.append(["Charms", sub_data(dataset, 17)])
     sub_dataset.append(["Flying", sub_data(dataset, 18)])
 
-    histogram(sub_dataset)
-    scatter_plot(sub_dataset)
-    pair_plot(dataset)
+    st.markdown("## Histogramme")
+    if st.checkbox("Voir les histogrammes"):
+        for i, data in enumerate(sub_dataset) :
+            name = "fig_" + str(i)
+            dataframe = data[1]
+            name = px.histogram(dataframe[1:], color=1, marginal="violin", title=data[0])
+            st.write(name)
+
+def scatter_plot(sub_data):
+    name = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", \
+        "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", \
+        "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
+    st.markdown("## Scatter plot")
+    if st.checkbox("Voir les scatter plot"):
+        feature1 = st.selectbox("Feature 1:", name)
+        feature2 = st.selectbox("Feature 2:", name)
+        index1 = name.index(feature1) + 1
+        index2 = name.index(feature2) + 1 
+        fig = px.scatter(sub_data[1:], x=index1, y=index2, color=0, \
+            labels={str(index1):feature1, str(index2):feature2})
+        st.write(fig)
+
+def pair_plot(sub_data) :
+    features = list(range(1,14))
+    name = [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], ["Arithmancy", "Astronomy", \
+        "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", \
+            "Ancient Runes", "History of Magic", "Transfiguration", "Potions", \
+            "Care of Magical Creatures", "Charms", "Flying"]]
+    st.markdown("## Pair plot")
+    if st.checkbox("Voir les pair plots"):
+        fig_pair = px.scatter_matrix(sub_data[1:], dimensions=features, color=0)
+        fig_pair.update_traces(diagonal_visible=False, showupperhalf=False)
+        st.dataframe(name)
+        st.write(fig_pair)
+
+def vizualisation(dataset):
+    col = [1] + list(range(6, 19))
+    sub_data = [[l[i] for i in col] for l in dataset]
+
+    histogram(dataset)
+    scatter_plot(sub_data)
+    pair_plot(sub_data)
