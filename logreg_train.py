@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+import copy
 
 from preprocess_train import preprocess
 
@@ -37,8 +38,12 @@ def timeit(method):
 #         thetas.append(push)
 #     return theta0_tmp, theta1_tmp, thetas
 
-def convert_one_vs_all(dataframe, feature):
-    st.write("You're in convert")
+def convert_one_vs_all(dataset, feature):
+    sub_data = copy.deepcopy(dataset)
+    for i, row in enumerate(sub_data[1:]):
+        if row[0] != feature :
+            sub_data[i + 1][0] = 4
+    return sub_data
 
 @timeit
 def logreg_train(dataset, **kwargs):
@@ -49,3 +54,7 @@ def logreg_train(dataset, **kwargs):
     slytherin = convert_one_vs_all(sub_data, 1)
     gryffindor = convert_one_vs_all(sub_data, 2)
     hufflepuff = convert_one_vs_all(sub_data, 3)
+    st.dataframe(ravenclaw)
+    st.dataframe(slytherin)
+    st.dataframe(gryffindor)
+    st.dataframe(hufflepuff)
