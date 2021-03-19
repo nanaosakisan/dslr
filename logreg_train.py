@@ -1,8 +1,8 @@
 import streamlit as st
 import time
-import copy
+import math
 
-from preprocess_train import preprocess
+from preprocess_train import preprocess, convert_one_vs_all
 
 def timeit(method):
     def timed(*args, **kw):
@@ -18,43 +18,50 @@ def timeit(method):
         return result    
     return timed
 
-# def sum(sub_data, theta0, theta1) :
-#     sum0, sum1 = 0, 0
-#     for row in sub_data :
-#         sum0 += ((theta0 + theta1 * row[1], theta2 * row[2]) - y) * row[1]
-#         sum1 += ((theta0 + theta1 * row[1], theta2 * row[2]) - y) * row[2]
-#     return sum0, sum1
+def score(row, theta0, theta1, theta2):
+    return theta0 + theta1 * row[1] + theta2 * row[2]
 
-# @timeit
-# def gradient(sub_data, iter_input, min_data, max_data, alpha, **kwargs) :
-#     theta0_tmp, theta1_tmp = 0, 0
-#     thetas = []
-#     m = len(sub_data)
-#     for _i in range(0, iter_input) :
-#         sum0, sum1 = sum(sub_data, theta0_tmp, theta1_tmp)
-#         theta0_tmp -= alpha * (1 / m) * sum0
-#         theta1_tmp -= alpha * (1 / m) * sum1
-#         push = [theta0_tmp * (max_data - min_data) + min_data, theta1_tmp]
-#         thetas.append(push)
-#     return theta0_tmp, theta1_tmp, thetas
+def sum_(sub_data, theta0, theta1, theta2) :
+    sum0, sum1, sum2 = 0, 0, 0
+    for row in sub_data[1:] :
+        sum0 += (1/(1 + math.exp(-score(row, theta0, theta1, theta2)))) - row[0]
+        sum1 += ((1/(1 + math.exp(-(score(row, theta0, theta1, theta2))))) - row[0]) * row[1]
+        sum2 += ((1/(1 + math.exp(-(score(row, theta0, theta1, theta2))))) - row[0]) * row[2]
+    return sum0, sum1, sum2
 
-def convert_one_vs_all(dataset, feature):
-    sub_data = copy.deepcopy(dataset)
-    for i, row in enumerate(sub_data[1:]):
-        if row[0] != feature :
-            sub_data[i + 1][0] = 4
-    return sub_data
+def gradient(sub_data, iter_input, min_data, max_data, alpha) :
+    theta0_tmp, theta1_tmp, theta2_tmp = 0.0, 0.0, 0.0
+    theta0, theta1, theta2 = 0.0, 0.0, 0.0
+    thetas = []
+    m = len(sub_data)
+    for _i in range(0, iter_input) :
+        sum0, sum1, sum2 = sum_(sub_data, theta0, theta1, theta2)
+        theta0_tmp -= alpha * (1 / m) * sum0
+        theta1_tmp -= alpha * (1 / m) * sum1
+        theta2_tmp -= alpha * (1 / m) * sum2
+        theta0, theta1, theta2 = theta0_tmp, theta1_tmp, theta2_tmp
+        push = [theta0_tmp * (max_data - min_data) + min_data, theta1_tmp]
+        thetas.append(push)
+    return theta0, theta1, theta2, thetas
 
 @timeit
-def logreg_train(dataset, **kwargs):
-    st.markdown("## Entrainement")
-    sub_data = preprocess(dataset, 2 + 5, 3 + 5)
+def logreg_train(dataset, iter_input, alpha, **kwargs):
+    sub_data, min_, max_ = preprocess(dataset, 2 + 5, 3 + 5)
     st.dataframe(sub_data)
+
     ravenclaw = convert_one_vs_all(sub_data, 0)
     slytherin = convert_one_vs_all(sub_data, 1)
     gryffindor = convert_one_vs_all(sub_data, 2)
     hufflepuff = convert_one_vs_all(sub_data, 3)
-    st.dataframe(ravenclaw)
-    st.dataframe(slytherin)
-    st.dataframe(gryffindor)
-    st.dataframe(hufflepuff)
+    
+    theta_train = []
+    push = gradient(ravenclaw, iter_input, min_, max_, alpha)
+    theta_train.append(push)
+    push = gradient(slytherin, iter_input, min_, max_, alpha)
+    theta_train.append(push)
+    push = gradient(gryffindor, iter_input, min_, max_, alpha)
+    theta_train.append(push)
+    push = gradient(hufflepuff, iter_input, min_, max_, alpha)
+    theta_train.append(push)
+
+    return theta_train, min_, max_

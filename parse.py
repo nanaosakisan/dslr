@@ -25,7 +25,7 @@ def check_features(content) :
 
 def check_house(dataset):
     house = ["Ravenclaw", "Slytherin", "Gryffindor", "Hufflepuff"]
-    for obj in dataset[1:] :
+    for i, obj in enumerate(dataset[1:]):
         if obj[1] not in house :
             return 0, "Maison inconnue à la ligne : " + str(i) + """. Feature attendu : \
             ["Ravenclaw", "Slytherin", "Gryffindor", "Hufflepuff"]."""
@@ -76,6 +76,36 @@ def parse_train(filename) :
             dataset.append(content)
     filename.close()
     res, error = check_house(dataset)
+    res, error = check_birthday(dataset)
+    res, error = check_hand(dataset)
+    res, error, dataset = check_grade(dataset)
+    if res == 0:
+        return 0, error, dataset
+    return 1, "", dataset
+
+def check_house_pred(dataset):
+    house = ["Ravenclaw", "Slytherin", "Gryffindor", "Hufflepuff"]
+    for obj in dataset[1:5] :
+        st.write(obj)
+        if obj[1] not in house :
+            return 0, "Maison inconnue à la ligne : " + str(i) + """. Feature attendu : \
+            ["Ravenclaw", "Slytherin", "Gryffindor", "Hufflepuff"]."""
+    return 1, ""
+
+def parse_predict(filename) :
+    lines = filename.read().decode("utf-8").split("\n")
+    dataset = []
+
+    for i, line in enumerate(lines):
+        content = line.split(",")
+        if i == 0 :
+            res, error = check_features(content)
+            if res == 0:
+                return 0, error, dataset 
+        if len(content) == 19 :
+            dataset.append(content)
+    filename.close()
+    res, error = check_house_pred(dataset)
     res, error = check_birthday(dataset)
     res, error = check_hand(dataset)
     res, error, dataset = check_grade(dataset)
