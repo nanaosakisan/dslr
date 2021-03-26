@@ -25,7 +25,7 @@ def histogram(dataset):
     sub_dataset.append(["Charms", sub_data(dataset, 17)])
     sub_dataset.append(["Flying", sub_data(dataset, 18)])
 
-    st.markdown("## Histogramme")
+    st.markdown("### Histogramme")
     if st.checkbox("Voir les histogrammes"):
         for i, data in enumerate(sub_dataset) :
             name = "fig_" + str(i)
@@ -37,7 +37,7 @@ def scatter_plot(sub_data):
     name = ["Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts", \
         "Divination", "Muggle Studies", "Ancient Runes", "History of Magic", \
         "Transfiguration", "Potions", "Care of Magical Creatures", "Charms", "Flying"]
-    st.markdown("## Scatter plot")
+    st.markdown("### Scatter plot")
     if st.checkbox("Voir les scatter plot"):
         feature1 = st.selectbox("Feature 1:", name)
         feature2 = st.selectbox("Feature 2:", name)
@@ -53,7 +53,7 @@ def pair_plot(sub_data) :
         "Herbology", "Defense Against the Dark Arts", "Divination", "Muggle Studies", \
             "Ancient Runes", "History of Magic", "Transfiguration", "Potions", \
             "Care of Magical Creatures", "Charms", "Flying"]]
-    st.markdown("## Pair plot")
+    st.markdown("### Pair plot")
     if st.checkbox("Voir les pair plots"):
         fig_pair = px.scatter_matrix(sub_data[1:], dimensions=features, color=0)
         fig_pair.update_traces(diagonal_visible=False, showupperhalf=False)

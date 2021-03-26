@@ -19,15 +19,23 @@ def sigmoid(pred):
 
 def logreg_predict(dataset, theta_train, min_, max_):
     sub_data = preprocess_predict(dataset, 2 + 5, 3 + 5, min_, max_)
+    st.markdown("### Dataset de prediction après le preprocess")
     st.dataframe(sub_data)
 
     house = {0:"Ravenclaw", 1:"Slytherin", 2:"Gryffindor", 3:"Hufflepuff"}
 
     house_predict = []
-    for i, row in enumerate(sub_data[1:]):
+
+    st.write("Theta")
+    st.dataframe(theta_train)
+    st.write("Theta0: ", theta_train[0][0])
+    st.write("Theta1: ", theta_train[0][1])
+    st.write("Theta2: ", theta_train[0][2])
+    
+    for i, row in enumerate(sub_data[1:5]):
         pred = predict(row, theta_train)
         proba = sigmoid(pred)
-        # st.dataframe(proba)
+        st.dataframe(proba)
         index = proba.index(max(proba))
         # push = [i, house.get(index)]
         push = [i, index]

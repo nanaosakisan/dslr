@@ -40,19 +40,26 @@ def gradient(sub_data, iter_input, min_data, max_data, alpha) :
         theta1_tmp -= alpha * (1 / m) * sum1
         theta2_tmp -= alpha * (1 / m) * sum2
         theta0, theta1, theta2 = theta0_tmp, theta1_tmp, theta2_tmp
-        push = [theta0_tmp * (max_data - min_data) + min_data, theta1_tmp]
-        thetas.append(push)
+        # push = [theta0_tmp * (max_data - min_data) + min_data, theta1_tmp]
+        # thetas.append(push)
     return theta0, theta1, theta2, thetas
 
 @timeit
 def logreg_train(dataset, iter_input, alpha, **kwargs):
     sub_data, min_, max_ = preprocess(dataset, 2 + 5, 3 + 5)
+    st.write("Dataset train après preprocess")
     st.dataframe(sub_data)
 
     ravenclaw = convert_one_vs_all(sub_data, 0)
     slytherin = convert_one_vs_all(sub_data, 1)
     gryffindor = convert_one_vs_all(sub_data, 2)
     hufflepuff = convert_one_vs_all(sub_data, 3)
+
+    st.write("Dataset ravenclaw:")
+    st.dataframe(ravenclaw)
+    st.write("Dataset slytherin:")
+    st.dataframe(slytherin)
+
     
     theta_train = []
     push = gradient(ravenclaw, iter_input, min_, max_, alpha)
