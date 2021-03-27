@@ -4,6 +4,12 @@ import math
 
 from preprocess_train import preprocess, convert_one_vs_all
 
+# fonction cout J = -1/m * E((yp * log(ym)) + (1 - yp) * log(1 - yr))
+# yr = y reel, yp = y predit
+
+# gradient descent: theta1 -= a * (1 / m) * E((h(x) - y) *x1) 
+# avec h(x) = 1 / (1 + exp(-A)) et A = theta0 + theta1 * x1 + theta2 * x2
+
 def timeit(method):
     def timed(*args, **kw):
         ts = time.time()
