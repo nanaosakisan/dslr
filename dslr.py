@@ -38,17 +38,17 @@ if radio == "Visualisation":
 elif radio == "Entrainement":
     st.markdown("## Entrainement")
     if len(session_state.dataset) != 0 :
-        iter_input = st.slider("Itérations", 0, 10000)
+        iter_input = st.slider("Itérations", 0, 10000, 1500)
         alpha = st.slider("Alpha", 0.01, 0.1, 0.1)
         session_state.theta_train, session_state.min_, session_state.max_ = logreg_train(session_state.dataset, iter_input, alpha)
-        st.write("Theta ravenclaw: " + str(session_state.theta_train[0][0]) + ", " + \
-            str(session_state.theta_train[0][1]) +", " + str(session_state.theta_train[0][2]))
-        st.write("Theta slytherin: " + str(session_state.theta_train[1][0]) + ", " + \
-            str(session_state.theta_train[1][1]) +", " + str(session_state.theta_train[1][2]))
-        st.write("Theta gryffindor: " + str(session_state.theta_train[2][0]) + ", " + \
-            str(session_state.theta_train[2][1]) +", " + str(session_state.theta_train[2][2]))
-        st.write("Theta hufflepuff: " + str(session_state.theta_train[3][0]) + ", " + \
-            str(session_state.theta_train[3][1]) +", " + str(session_state.theta_train[3][2]))
+        # st.write("Theta ravenclaw: " + str(session_state.theta_train[0][0]) + ", " + \
+        #     str(session_state.theta_train[0][1]) +", " + str(session_state.theta_train[0][2]))
+        # st.write("Theta slytherin: " + str(session_state.theta_train[1][0]) + ", " + \
+        #     str(session_state.theta_train[1][1]) +", " + str(session_state.theta_train[1][2]))
+        # st.write("Theta gryffindor: " + str(session_state.theta_train[2][0]) + ", " + \
+        #     str(session_state.theta_train[2][1]) +", " + str(session_state.theta_train[2][2]))
+        # st.write("Theta hufflepuff: " + str(session_state.theta_train[3][0]) + ", " + \
+        #     str(session_state.theta_train[3][1]) +", " + str(session_state.theta_train[3][2]))
 elif radio == "Prediction":
     st.markdown("## Prediction")
     file_predict = st.file_uploader("Fichier de prédiction :", type="csv")

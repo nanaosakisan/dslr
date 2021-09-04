@@ -1,6 +1,9 @@
 import streamlit as st
+import numpy as np
+import pandas as pd
 import time
 import math
+from numpy.random import rand
 
 from preprocess_train import preprocess, convert_one_vs_all
 
@@ -24,57 +27,111 @@ def timeit(method):
         return result    
     return timed
 
-def score(row, theta0, theta1, theta2):
-    return theta0 + theta1 * row[1] + theta2 * row[2]
+class LogReg():
+    def preprocess_(self, dataset):
+        X_train = pd.DataFrame(dataset)
+        X_train = X_train[[1, 7, 8]]
+        X_train = X_train.dropna()
+        # X_train = np.array(dataset)
+        # X_train = np.delete(X_train, 0, 0)
+        # X_train = X_train[:, [1, 7, 8]]
+        # [print(row) for row in X_train]
+        # print(X_train.dtype)
+        # X_train = X_train[~np.isnan(X_train).any(axis=1)]
+        # X_train = np.interp(X_train, (X_train.min(), X_train.max()), (-1, +1))
+        y = []
+        return X_train, y
 
-def sum_(sub_data, theta0, theta1, theta2) :
+
+    def sigmoid(self, x):
+        return 1 / (1 + math.exp(-x))
+
+    def gradient(self, X_train, y, iter_input, lr):
+        theta0_tmp, theta1_tmp, theta2_tmp = 0.0, 0.0, 0.0
+        theta0, theta1, theta2 = 0.0, 0.0, 0.0
+        thetas = []
+        m = len(X_train)
+        X_train = np.array(X_train)
+        # for _i in range(0, iter_input) :
+        #     sum0, sum1, sum2 = sum_(X_train, y, theta0, theta1, theta2)
+        #     theta0_tmp -= lr * (1 / m) * sum0
+        #     theta1_tmp -= lr * (1 / m) * sum1
+        #     theta2_tmp -= lr * (1 / m) * sum2
+        #     theta0, theta1, theta2 = theta0_tmp, theta1_tmp, theta2_tmp
+        #     push = [theta0, theta1, theta2]
+        #     thetas.append(push)
+        # return theta0, theta1, theta2, thetas
+        weight = rand(X_train.shape[1])
+        for _ in range(0, 10):
+            test = np.dot(X_train, weight)
+            # y_pred = np.array([sigmoid(i) for i in test])
+            y_pred = self.sigmoid(test)
+            weight -= 0.05 * np.dot(X_train.T, y_pred-y)
+        # st.write(weight)
+        return weight
+
+def score (theta0, theta1, theta2, row) :
+    return theta0 + theta1 * row[0] + theta2 * row[1] 
+
+def sum_(sub_data, y, theta0, theta1, theta2) :
     sum0, sum1, sum2 = 0, 0, 0
-    for row in sub_data[1:] :
-        sum0 += (1/(1 + math.exp(-score(row, theta0, theta1, theta2)))) - row[0]
-        sum1 += ((1/(1 + math.exp(-(score(row, theta0, theta1, theta2))))) - row[0]) * row[1]
-        sum2 += ((1/(1 + math.exp(-(score(row, theta0, theta1, theta2))))) - row[0]) * row[2]
+    for i, row in enumerate(sub_data):
+        sig = sigmoid(score(theta0, theta1, theta2, row))
+        sum0 += sig - y[i]
+        sum1 += (sig - y[i]) * row[0]
+        sum2 += (sig - y[i]) * row[1]
     return sum0, sum1, sum2
-
-def gradient(sub_data, iter_input, min_data, max_data, alpha) :
-    theta0_tmp, theta1_tmp, theta2_tmp = 0.0, 0.0, 0.0
-    theta0, theta1, theta2 = 0.0, 0.0, 0.0
-    thetas = []
-    m = len(sub_data)
-    for _i in range(0, iter_input) :
-        sum0, sum1, sum2 = sum_(sub_data, theta0, theta1, theta2)
-        theta0_tmp -= alpha * (1 / m) * sum0
-        theta1_tmp -= alpha * (1 / m) * sum1
-        theta2_tmp -= alpha * (1 / m) * sum2
-        theta0, theta1, theta2 = theta0_tmp, theta1_tmp, theta2_tmp
-        # push = [theta0_tmp * (max_data - min_data) + min_data, theta1_tmp]
-        # thetas.append(push)
-    return theta0, theta1, theta2, thetas
 
 @timeit
 def logreg_train(dataset, iter_input, alpha, **kwargs):
-    sub_data, min_, max_ = preprocess(dataset, 2 + 5, 3 + 5)
+    st.write("Dataset train avant preprocess")
+    st.dataframe(dataset)
+
+    # sub_data, min_, max_ = preprocess(dataset, 2 + 5, 3 + 5)
+    # st.write("Dataset train après preprocess")
+    # st.dataframe(sub_data)
+
+
+    # ravenclaw = convert_one_vs_all(sub_data, 0)
+    # y_raven = [i.pop(0) for i in ravenclaw[1:]]
+    # ravenclaw.pop(0)
+
+    # slytherin = convert_one_vs_all(sub_data, 1)
+    # y_slyth = [i.pop(0) for i in slytherin[1:]]
+    # slytherin.pop(0)
+
+
+    # gryffindor = convert_one_vs_all(sub_data, 2)
+    # y_gryff = [i.pop(0) for i in gryffindor[1:]]
+    # gryffindor.pop(0)
+
+    # hufflepuff = convert_one_vs_all(sub_data, 3)
+    # y_huffle = [i.pop(0) for i in hufflepuff[1:]]
+    # hufflepuff.pop(0)
+
+
+    # st.write("Dataset ravenclaw:")
+    # st.dataframe(ravenclaw)
+    # st.write("Dataset gynffindor:")
+    # st.dataframe(gryffindor)
+
+    log_train, y = LogReg().preprocess_(dataset)
     st.write("Dataset train après preprocess")
-    st.dataframe(sub_data)
+    st.dataframe(log_train)
+    st.dataframe(y)
 
-    ravenclaw = convert_one_vs_all(sub_data, 0)
-    slytherin = convert_one_vs_all(sub_data, 1)
-    gryffindor = convert_one_vs_all(sub_data, 2)
-    hufflepuff = convert_one_vs_all(sub_data, 3)
+    # theta_train = []
+    # push = gradient(ravenclaw, y_raven, iter_input, min_, max_, alpha)
 
-    st.write("Dataset ravenclaw:")
-    st.dataframe(ravenclaw)
-    st.write("Dataset slytherin:")
-    st.dataframe(slytherin)
+    # theta_train.append(push)
+    # push = gradient(slytherin, y_slyth, iter_input, min_, max_, alpha)
 
-    
-    theta_train = []
-    push = gradient(ravenclaw, iter_input, min_, max_, alpha)
-    theta_train.append(push)
-    push = gradient(slytherin, iter_input, min_, max_, alpha)
-    theta_train.append(push)
-    push = gradient(gryffindor, iter_input, min_, max_, alpha)
-    theta_train.append(push)
-    push = gradient(hufflepuff, iter_input, min_, max_, alpha)
-    theta_train.append(push)
+    # theta_train.append(push)
+    # push = gradient(gryffindor, y_gryff, iter_input, min_, max_, alpha)
 
+    # theta_train.append(push)
+    # push = gradient(hufflepuff, y_huffle, iter_input, min_, max_, alpha)
+
+    # theta_train.append(push)
+    # st.write(theta_train)
     return theta_train, min_, max_

@@ -26,7 +26,7 @@ def get_feature(dataset, index1, index2):
 
 def preprocess(dataset, feature1, feature2):
     # preprocess qui va garder uniquement features choisie pour train, encoder la maison
-    # et scale les features numérique
+    # et scale les features numériques
 
     sub_data = [["House", "Feature1", "Feature2"]]
     house = encode_house(dataset, feature1, feature2)
