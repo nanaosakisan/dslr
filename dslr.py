@@ -9,10 +9,10 @@ st.title("DSLR")
 
 filename = st.file_uploader("Fichier d'entainement :")
 
-if filename :
+if filename:
     res, error, dataset = parse_train(filename)
     if res == 1:
-        col1, col2 = st.beta_columns(2)   
+        col1, col2 = st.beta_columns(2)
 
         st.markdown("## Dataset")
         st.dataframe(dataset)
@@ -24,4 +24,3 @@ if filename :
         logreg_train(dataset)
     else:
         st.write(error)
-        
