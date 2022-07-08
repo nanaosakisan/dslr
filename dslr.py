@@ -1,9 +1,10 @@
 import streamlit as st
 
-from parse import parse_train
+from utils.parse import parse_train
 from describe import describe
 from vizualisation import vizualisation
 from logreg_train import logreg_train
+from logreg_predict import logreg_predict
 
 st.title("DSLR")
 
@@ -12,8 +13,6 @@ filename = st.file_uploader("Fichier d'entainement :")
 if filename:
     res, error, dataset = parse_train(filename)
     if res == 1:
-        col1, col2 = st.beta_columns(2)
-
         st.markdown("## Dataset")
         st.dataframe(dataset)
         st.markdown("## Describe")
@@ -22,5 +21,6 @@ if filename:
         vizualisation(dataset)
 
         logreg_train(dataset)
+        logreg_predict("./thetas.csv")
     else:
         st.write(error)

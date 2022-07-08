@@ -46,7 +46,7 @@ def accuracy_score_(
 
 
 def precision_score_(
-    y: np.ndarray, y_hat: np.ndarray, pos_label: Union[int, str] = 1
+    y: np.ndarray, y_hat: np.ndarray, pos_label: Union[int, str] = 1, eps: float = 1e-15
 ) -> Optional[float]:
     """
     Compute the precision score.
@@ -69,7 +69,7 @@ def precision_score_(
     ):
         return None
     tp, tn, fp, fn = count_tp_tn_fp_fn(y, y_hat, pos_label)
-    return tp / (tp + fp)
+    return tp / (tp + fp + eps)
 
 
 def recall_score_(

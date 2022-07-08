@@ -144,7 +144,7 @@ class MyLogisticRegression:
             or self.thetas.shape[1] != 1
         ):
             return None
-        X_prime = np.c_[np.ones(len(x)), x]
+        X_prime = np.array(np.c_[np.ones(len(x)), x], dtype=np.float)
         return 1 / (1 + np.exp(-X_prime.dot(self.thetas)))
 
     def vec_reg_logistic_grad(

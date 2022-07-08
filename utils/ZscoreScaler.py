@@ -8,6 +8,9 @@ class ZscoreScaler:
             self.std = std
 
     def fit(self, X: np.ndarray):
+        print("fit")
+        print(X.shape)
+        print(X)
         self.mean = X.mean(axis=0)
         self.std = X.std(axis=0)
 
