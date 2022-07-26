@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import io
 
-from utils.parse import parse_train
 from describe import describe
 from vizualisation import vizualisation
 from logreg_train import logreg_train
@@ -24,7 +23,7 @@ if filename:
         st.dataframe(des.astype(str))
         vizualisation(data)
 
-    #     # logreg_train(dataset)
+        logreg_train(dataset)
     #     # logreg_predict("./thetas.csv")
     else:
         st.write("Error in train dataframe")
