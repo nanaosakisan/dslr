@@ -1,4 +1,6 @@
 import streamlit as st
+import pandas as pd
+import io
 
 from utils.parse import parse_train
 from describe import describe
@@ -11,16 +13,19 @@ st.title("DSLR")
 filename = st.file_uploader("Fichier d'entainement :")
 
 if filename:
-    res, error, dataset = parse_train(filename)
-    if res == 1:
+    data = pd.read_csv(io.StringIO(filename.read().decode('utf-8')), delimiter=',', index_col=0)
+    data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
+    true_schema = pd.read_json("./schema.json")
+    if data_schema.equals(true_schema) :
         st.markdown("## Dataset")
-        st.dataframe(dataset)
+        st.dataframe(data)
         st.markdown("## Describe")
-        des = describe(dataset)
-        st.dataframe(des)
-        vizualisation(dataset)
+        des = describe(data)
+        st.write(des)
+    #     # st.dataframe(data)
+    #     # vizualisation(dataset)
 
-        logreg_train(dataset)
-        logreg_predict("./thetas.csv")
+    #     # logreg_train(dataset)
+    #     # logreg_predict("./thetas.csv")
     else:
-        st.write(error)
+        st.write("Error in train dataframe")
