@@ -21,9 +21,8 @@ if filename:
         st.dataframe(data)
         st.markdown("## Describe")
         des = describe(data)
-        st.write(des)
-    #     # st.dataframe(data)
-    #     # vizualisation(dataset)
+        st.dataframe(des.astype(str))
+        vizualisation(data)
 
     #     # logreg_train(dataset)
     #     # logreg_predict("./thetas.csv")
