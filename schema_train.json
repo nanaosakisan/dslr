@@ -1,0 +1,78 @@
+[
+    {
+      "name": "Index",
+      "type": "integer"
+    },
+    {
+      "name": "Hogwarts House",
+      "type": "string"
+    },
+    {
+      "name": "First Name",
+      "type": "string"
+    },
+    {
+      "name": "Last Name",
+      "type": "string"
+    },
+    {
+      "name": "Birthday",
+      "type": "string"
+    },
+    {
+      "name": "Best Hand",
+      "type": "string"
+    },
+    {
+      "name": "Arithmancy",
+      "type": "number"
+    },
+    {
+      "name": "Astronomy",
+      "type": "number"
+    },
+    {
+      "name": "Herbology",
+      "type": "number"
+    },
+    {
+      "name": "Defense Against the Dark Arts",
+      "type": "number"
+    },
+    {
+      "name": "Divination",
+      "type": "number"
+    },
+    {
+      "name": "Muggle Studies",
+      "type": "number"
+    },
+    {
+      "name": "Ancient Runes",
+      "type": "number"
+    },
+    {
+      "name": "History of Magic",
+      "type": "number"
+    },
+    {
+      "name": "Transfiguration",
+      "type": "number"
+    },
+    {
+      "name": "Potions",
+      "type": "number"
+    },
+    {
+      "name": "Care of Magical Creatures",
+      "type": "number"
+    },
+    {
+      "name": "Charms",
+      "type": "number"
+    },
+    {
+      "name": "Flying",
+      "type": "number"
+    }
+  ]

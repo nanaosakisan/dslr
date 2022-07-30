@@ -1,5 +1,8 @@
+import streamlit as st
 import pandas as pd
 import math
+
+import settings
 
 FEATURES = ["Arithmancy", "Astronomy","Herbology","Defense Against the Dark Arts","Divination","Muggle Studies","Ancient Runes","History of Magic","Transfiguration","Potions",\
     "Care of Magical Creatures","Charms","Flying"]
@@ -94,3 +97,12 @@ def describe(dataset):
         des = push_feature(dataset[f], des, f)
     df = pd.DataFrame(des[1:], columns=des[0]).T
     return df.rename(columns=df.iloc[0]).drop(df.index[0])
+
+
+st.title("Describe")
+data = settings.dataset
+if data.size == 0:
+    st.error("Please upload a file.")
+else :
+    des = describe(data)
+    st.dataframe(des.astype(str))

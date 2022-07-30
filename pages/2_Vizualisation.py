@@ -1,5 +1,7 @@
+from pydoc import visiblename
 import plotly.express as px
 import streamlit as st
+import settings
 
 FEATURES = ["Arithmancy", "Astronomy","Herbology","Defense Against the Dark Arts","Divination","Muggle Studies","Ancient Runes","History of Magic","Transfiguration","Potions",\
     "Care of Magical Creatures","Charms","Flying"]
@@ -40,3 +42,10 @@ def vizualisation(dataset):
     histogram(dataset)
     scatter_plot(dataset)
     pair_plot(dataset)
+
+st.title("Vizualisation")
+data = settings.dataset
+if data.size == 0:
+    st.error("Please upload a file.")
+else :
+    vizualisation(data)
