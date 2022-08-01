@@ -134,7 +134,6 @@ class MyLogisticRegression:
         Raises:
             This function should not raise any Exception.
         """
-
         if (
             not isinstance(x, np.ndarray)
             or not isinstance(self.thetas, np.ndarray)

@@ -2,10 +2,24 @@ import streamlit as st
 import pandas as pd
 import math
 
-import settings
+import utils.settings as settings
 
-FEATURES = ["Arithmancy", "Astronomy","Herbology","Defense Against the Dark Arts","Divination","Muggle Studies","Ancient Runes","History of Magic","Transfiguration","Potions",\
-    "Care of Magical Creatures","Charms","Flying"]
+FEATURES = [
+    "Arithmancy",
+    "Astronomy",
+    "Herbology",
+    "Defense Against the Dark Arts",
+    "Divination",
+    "Muggle Studies",
+    "Ancient Runes",
+    "History of Magic",
+    "Transfiguration",
+    "Potions",
+    "Care of Magical Creatures",
+    "Charms",
+    "Flying",
+]
+
 
 def max_value(data_list):
     max_ = 0
@@ -103,6 +117,6 @@ st.title("Describe")
 data = settings.dataset
 if data.size == 0:
     st.error("Please upload a file.")
-else :
+else:
     des = describe(data)
     st.dataframe(des.astype(str))

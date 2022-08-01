@@ -1,18 +1,30 @@
 from pydoc import visiblename
 import plotly.express as px
 import streamlit as st
-import settings
+import utils.settings as settings
 
-FEATURES = ["Arithmancy", "Astronomy","Herbology","Defense Against the Dark Arts","Divination","Muggle Studies","Ancient Runes","History of Magic","Transfiguration","Potions",\
-    "Care of Magical Creatures","Charms","Flying"]
+FEATURES = [
+    "Arithmancy",
+    "Astronomy",
+    "Herbology",
+    "Defense Against the Dark Arts",
+    "Divination",
+    "Muggle Studies",
+    "Ancient Runes",
+    "History of Magic",
+    "Transfiguration",
+    "Potions",
+    "Care of Magical Creatures",
+    "Charms",
+    "Flying",
+]
+
 
 def histogram(dataset):
     st.markdown("## Histogramme")
     if st.checkbox("Voir les histogrammes"):
         for f in FEATURES:
-            name = px.histogram(
-                dataset[f][1:], marginal="violin", title=f
-            )
+            name = px.histogram(dataset[f][1:], marginal="violin", title=f)
             st.write(name)
 
 
@@ -33,7 +45,9 @@ def scatter_plot(dataset):
 def pair_plot(dataset):
     st.markdown("## Pair plot")
     if st.checkbox("Voir les pair plots"):
-        fig_pair = px.scatter_matrix(dataset, dimensions = FEATURES, color="Hogwarts House")
+        fig_pair = px.scatter_matrix(
+            dataset, dimensions=FEATURES, color="Hogwarts House"
+        )
         fig_pair.update_traces(diagonal_visible=False, showupperhalf=False)
         st.write(fig_pair)
 
@@ -43,9 +57,10 @@ def vizualisation(dataset):
     scatter_plot(dataset)
     pair_plot(dataset)
 
+
 st.title("Vizualisation")
 data = settings.dataset
 if data.size == 0:
     st.error("Please upload a file.")
-else :
+else:
     vizualisation(data)
