@@ -1,4 +1,5 @@
 from __future__ import annotations
+import random
 import numpy as np
 from typing import Optional, Dict, Any
 
@@ -188,7 +189,49 @@ class MyLogisticRegression:
             * (X_prime.T.dot(self.predict_(x) - y) + self.lambda_ * theta_prime)
         )
 
-    def fit_(self, x: np.ndarray, y: np.ndarray) -> None:
+    def vec_reg_sgd(
+        self, x: np.ndarray, y: np.ndarray, k: int = 40
+    ) -> Optional[np.ndarray]:
+        """Computes the regularized logistic stochiastic gradient of three non-empty
+        numpy.array, without any for-loop. The three arrays must have compatible shapes.
+        Args:
+            y: has to be a numpy.array, a vector of shape m * 1.
+            x: has to be a numpy.array, a matrix of dimesion m * n.
+            k: has to be an int, a number so select how many feature will be used to
+            estimate the predict thetas/
+            theta: has to be a numpy.array, a vector of shape (n + 1) * 1.
+            lambda_: has to be a float.
+        Return:
+            A numpy.array, a vector of shape (n + 1) * 1, containing the results of the formula for all j.
+            None if y, x, or theta are empty numpy.array.
+            None if y, x or theta does not share compatibles shapes.
+            None if y, x or theta or lambda_ is not of the expected type.
+        Raises:
+            This function should not raise any Exception.
+        """
+        if (
+            not isinstance(y, np.ndarray)
+            or not isinstance(x, np.ndarray)
+            or not isinstance(self.thetas, np.ndarray)
+            or not isinstance(self.lambda_, float)
+            or y.size == 0
+            or x.size == 0
+            or self.thetas.size == 0
+            or y.shape[1] != 1
+            or y.shape[0] != x.shape[0]
+            or x.shape[1] != self.thetas.shape[0] - 1
+            or self.thetas.shape[1] != 1
+        ):
+            return None
+        data_tmp = np.c_[x, y]
+        id_elem_ = random.sample(range(data_tmp.shape[0]), 40)
+        data_sample = data_tmp[id_elem_]
+        x = data_sample[:, :-1]
+        y = data_sample[:, -1].reshape(-1, 1)
+        X_prime = np.c_[np.ones(len(x)), x]
+        return np.sum((-2 / k * X_prime) * (y - X_prime.dot(self.thetas)))
+
+    def fit_(self, x: np.ndarray, y: np.ndarray, stochiastic: bool = False) -> None:
         """Computes a gradient vector from three non-empty numpy.array, without any for-loop.
         The three arrays must have compatible shapes.
         Args:
@@ -217,5 +260,11 @@ class MyLogisticRegression:
             or self.thetas.shape[0] != x.shape[1] + 1
         ):
             return None
-        for _ in range(self.max_iter):
-            self.thetas = self.thetas - self.alpha * self.vec_reg_logistic_grad(x, y)
+        if stochiastic == False:
+            for _ in range(self.max_iter):
+                self.thetas = self.thetas - self.alpha * self.vec_reg_logistic_grad(
+                    x, y
+                )
+        else:
+            for _ in range(self.max_iter):
+                self.thetas = self.thetas - self.alpha * self.vec_reg_sgd(x, y, 40)
