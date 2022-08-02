@@ -21,10 +21,15 @@ FEATURES = [
 
 
 def histogram(dataset):
-    st.markdown("## Histogramme")
+    st.markdown("## Histogram")
     if st.checkbox("Voir les histogrammes"):
         for f in FEATURES:
-            name = px.histogram(dataset[f][1:], marginal="violin", title=f)
+            name = px.histogram(
+                dataset[["Hogwarts House", f]],
+                marginal="violin",
+                title=f,
+                color="Hogwarts House",
+            )
             st.write(name)
 
 
