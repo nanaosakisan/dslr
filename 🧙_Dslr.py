@@ -18,9 +18,9 @@ if filename:
     data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
     true_schema = pd.read_json("./utils/schema.json")
 
-    if data_schema.equals(true_schema):
-        st.markdown("## Dataset")
-        st.dataframe(data)
-        settings.dataset = data
-    else:
-        st.write("Error in train dataframe.")
+    # if data_schema.equals(true_schema):
+    st.markdown("## Dataset")
+    st.dataframe(data)
+    settings.dataset = data
+    # else:
+    #     st.write("Error in train dataframe.")

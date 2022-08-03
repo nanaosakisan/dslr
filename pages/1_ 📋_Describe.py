@@ -1,31 +1,32 @@
 import streamlit as st
 import pandas as pd
 import math
+from typing import Tuple, Optional
 
 import utils.settings as settings
 
-FEATURES_NUM = [
-    "Arithmancy",
-    "Astronomy",
-    "Herbology",
-    "Defense Against the Dark Arts",
-    "Divination",
-    "Muggle Studies",
-    "Ancient Runes",
-    "History of Magic",
-    "Transfiguration",
-    "Potions",
-    "Care of Magical Creatures",
-    "Charms",
-    "Flying",
+NUM_DES = [
+    "Feature",
+    "Count",
+    "Unique",
+    "Mean",
+    "Std",
+    "Min",
+    "25%",
+    "50%",
+    "75%",
+    "Max",
+]
+CAT_DES = [
+    "Feature",
+    "Count",
+    "Unique",
+    "Most present",
+    "Values",
 ]
 
-FEATURES_CAT = ["Hogwarts House", "First Name", "Last Name", "Best Hand"]
 
-##pour les features categoriel : most_present, list_unique
-
-
-def max_value(data_list):
+def max_value(data_list: list) -> float:
     max_ = 0
     for row in data_list:
         if max_ < row:
@@ -33,15 +34,15 @@ def max_value(data_list):
     return max_
 
 
-def last_quartile(sub_data, count):
+def last_quartile(sub_data: list, count: int) -> float:
     return sub_data[int(0.75 * count) + 1]
 
 
-def fist_quartile(sub_data, count):
+def fist_quartile(sub_data: list, count: int) -> float:
     return sub_data[int(0.25 * count) + 1]
 
 
-def mediane(sub_data, count):
+def mediane(sub_data: list, count: int) -> float:
     mediane = 0
     if count % 2 != 0:
         mediane = sub_data[int(count / 2 - 1)]
@@ -51,7 +52,9 @@ def mediane(sub_data, count):
     return mediane
 
 
-def repartition(data_list, count):
+def repartition(data_list: list, count: int) -> Optional[Tuple[float, float, float]]:
+    if count == 0:
+        return None, None, None
     sub_data = data_list.copy()
     sub_data.sort()
     fist_quartile_ = fist_quartile(sub_data, count)
@@ -60,7 +63,7 @@ def repartition(data_list, count):
     return fist_quartile_, mediane_, last_quartile_
 
 
-def min_value(data_list):
+def min_value(data_list: list) -> float:
     min_ = 0
     for row in data_list:
         if min_ > row:
@@ -68,21 +71,25 @@ def min_value(data_list):
     return min_
 
 
-def std(data_list, mean, count):
+def std(data_list: list, mean: float, count: int) -> Optional[float]:
+    if count == 0:
+        return None
     std = 0
     for row in data_list:
         std += (row - mean) ** 2
     return math.sqrt(std / count)
 
 
-def mean(data_list, count):
+def mean(data_list: list, count: int) -> Optional[float]:
+    if count == 0:
+        return None
     mean = 0
     for row in data_list:
         mean += row
     return mean / count
 
 
-def unique(data_list):
+def unique(data_list: list) -> Tuple[int, list]:
     unique_list = []
     count = 0
     for row in data_list:
@@ -96,16 +103,20 @@ def count(data_list):
     return len(data_list)
 
 
-# def most_present(data_list, uni_list):
-#     uni_count = []
-#     for c, row in enumerate(data_list):
+def most_present(data_list: list, uni_list: list) -> str:
+    uni_count = []
+    for f in uni_list:
+        count = data_list.count(f)
+        uni_count.append([f, count])
+    uni_count = sorted(uni_count)
+    return uni_count[0][0]
 
 
-def push_feature_numerique(dataset, des, matiere):
+def push_feature_numerique(dataset: pd.DataFrame, des: list, feature: str) -> list:
     dataset = dataset.dropna()
     data_list = dataset.to_list()
     push = []
-    push.append(matiere)
+    push.append(feature)
     count_ = count(data_list)
     push.append(count_)
     uni, uni_list = unique(data_list)
@@ -122,13 +133,11 @@ def push_feature_numerique(dataset, des, matiere):
     push.append(last_quartile)
     max_ = max_value(data_list)
     push.append(max_)
-    push.append(None)
-    push.append(None)
     des.append(push)
     return des
 
 
-def push_feature_cat(dataset, des, feature):
+def push_feature_cat(dataset: pd.DataFrame, des: list, feature: str) -> list:
     dataset = dataset.dropna()
     data_list = dataset.to_list()
     push = []
@@ -137,50 +146,39 @@ def push_feature_cat(dataset, des, feature):
     push.append(count_)
     uni, uni_list = unique(data_list)
     push.append(uni)
-    push.append(None)
-    push.append(None)
-    push.append(None)
-    push.append(None)
-    push.append(None)
-    push.append(None)
-    push.append(None)
-    # most_ =
-    push.append(None)
+    most_ = most_present(data_list, uni_list)
+    push.append(most_)
     push.append(uni_list)
     des.append(push)
     return des
 
 
-def describe(dataset):
-    des = [
-        [
-            "Feature",
-            "Count",
-            "Unique",
-            "Mean",
-            "Std",
-            "Min",
-            "25%",
-            "50%",
-            "75%",
-            "Max",
-            "Most present",
-            "List categorie",
-        ]
-    ]
-    for f in FEATURES_NUM:
-        des = push_feature_numerique(dataset[f], des, f)
-    for f in FEATURES_CAT:
-        des = push_feature_cat(dataset[f], des, f)
-    df = pd.DataFrame(des[1:], columns=des[0]).T
-    return df.rename(columns=df.iloc[0]).drop(df.index[0])
+def describe(dataset: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    des_num = [NUM_DES]
+    des_cat = [CAT_DES]
+
+    types = dataset.dtypes
+    cat_features = types.where(lambda x: x == object).dropna().index.tolist()
+    num_features = types.where(lambda x: x != object).dropna().index.tolist()
+
+    for f in num_features:
+        des_num = push_feature_numerique(dataset[f], des_num, f)
+    for f in cat_features:
+        des_cat = push_feature_cat(dataset[f], des_cat, f)
+    df_num = pd.DataFrame(des_num[1:], columns=des_num[0]).T
+    df_cat = pd.DataFrame(des_cat[1:], columns=des_cat[0]).T
+    return df_num.rename(columns=df_num.iloc[0]).drop(df_num.index[0]), df_cat.rename(
+        columns=df_cat.iloc[0]
+    ).drop(df_cat.index[0])
 
 
 st.title("Describe")
 data = settings.dataset
 if data.size == 0:
-    st.error("Please upload a file.")
+    st.info("Please upload a file.")
 else:
-    des = describe(data)
-    st.dataframe(data)
-    st.dataframe(des.astype(str))
+    des_num, des_cat = describe(data)
+    st.markdown("### Numerical features")
+    st.dataframe(des_num.astype(str))
+    st.markdown("### Categorical features")
+    st.dataframe(des_cat.astype(str))

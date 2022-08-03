@@ -1,5 +1,7 @@
-from pydoc import visiblename
+from email.policy import default
+from http.cookiejar import DefaultCookiePolicy
 import plotly.express as px
+import pandas as pd
 import streamlit as st
 import utils.settings as settings
 
@@ -20,44 +22,48 @@ FEATURES = [
 ]
 
 
-def histogram(dataset):
+def histogram(dataset: pd.DataFrame) -> None:
     st.markdown("## Histogram")
+    name_col = data.columns
+    features = st.multiselect("Select features histogram", name_col)
+    color_feature = st.selectbox("Color feature histogram", name_col, index=0)
     if st.checkbox("Voir les histogrammes"):
-        for f in FEATURES:
+        for f in features:
             name = px.histogram(
-                dataset[["Hogwarts House", f]],
+                dataset[[color_feature, f]],
                 marginal="violin",
                 title=f,
-                color="Hogwarts House",
+                color=color_feature,
             )
             st.write(name)
 
 
-def scatter_plot(dataset):
-    name = dataset.columns[5:]
+def scatter_plot(dataset: pd.DataFrame) -> None:
+    name = dataset.columns
     st.markdown("## Scatter plot")
+    feature1 = st.selectbox("Feature 1:", name)
+    feature2 = st.selectbox("Feature 2:", name)
     if st.checkbox("Voir les scatter plot"):
-        feature1 = st.selectbox("Feature 1:", name)
-        feature2 = st.selectbox("Feature 2:", name)
         fig = px.scatter(
-            dataset[1:],
+            dataset,
             x=feature1,
             y=feature2,
         )
         st.write(fig)
 
 
-def pair_plot(dataset):
+def pair_plot(dataset: pd.DataFrame) -> None:
     st.markdown("## Pair plot")
+    name_col = data.columns
+    features = st.multiselect("Select features pair plot", name_col)
+    color_feature = st.selectbox("Color feature pair plot", name_col, index=0)
     if st.checkbox("Voir les pair plots"):
-        fig_pair = px.scatter_matrix(
-            dataset, dimensions=FEATURES, color="Hogwarts House"
-        )
+        fig_pair = px.scatter_matrix(dataset, dimensions=features, color=color_feature)
         fig_pair.update_traces(diagonal_visible=False, showupperhalf=False)
         st.write(fig_pair)
 
 
-def vizualisation(dataset):
+def vizualisation(dataset: pd.DataFrame) -> None:
     histogram(dataset)
     scatter_plot(dataset)
     pair_plot(dataset)
@@ -66,6 +72,6 @@ def vizualisation(dataset):
 st.title("Vizualisation")
 data = settings.dataset
 if data.size == 0:
-    st.error("Please upload a file.")
+    st.info("Please upload a file.")
 else:
     vizualisation(data)

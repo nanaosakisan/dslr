@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 import pandas as pd
 import numpy as np
 from os.path import exists
@@ -43,14 +42,14 @@ def get_dataset() -> pd.DataFrame:
     data = pd.read_csv(
         io.StringIO(dataset_filename.read().decode("utf-8")), delimiter=",", index_col=0
     )
-    if type(data["Hogwarts House"][0]) == str:
-        return pd.DataFrame()
+    # if type(data["Hogwarts House"][0]) == str:
+    #     return pd.DataFrame()
 
-    data["Hogwarts House"] = data["Hogwarts House"].astype(str)
-    data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
-    true_schema = pd.read_json("./utils/schema.json")
-    if not data_schema.equals(true_schema):
-        return pd.DataFrame
+    # data["Hogwarts House"] = data["Hogwarts House"].astype(str)
+    # data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
+    # true_schema = pd.read_json("./utils/schema.json")
+    # if not data_schema.equals(true_schema):
+    #     return pd.DataFrame
     return data
 
 
@@ -60,7 +59,6 @@ def prediction_(
     X = np.array(data[[feature1, feature2]])
     pred = predict(X, thetas.iloc[:, 1:].to_numpy())
     st.markdown("## Predict")
-    st.dataframe(pred)
     encodage = settings.encodage
     if encodage.size == 0:
         st.info("Encodage setting doesn't exist. Please run Logreg train.")
@@ -93,7 +91,7 @@ def logreg_predict(thetas_filename: str) -> None:
         "The two best features to select are : **Herbology** and **Defense against the dark arts**."
     )
 
-    name = data.columns[5:]
+    name = data.columns
     feature1 = st.selectbox("Feature 1:", name)
     feature2 = st.selectbox("Feature 2:", name)
     validate_button = st.button("Validate")

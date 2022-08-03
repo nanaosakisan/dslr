@@ -8,14 +8,10 @@ from utils.MinMaxNormalisation import MinMaxNormalisation
 def init() -> None:
     global dataset
     global encodage
-    global lr0
-    global lr1
-    global lr2
-    global lr3
+    global thetas
+    global lr
 
     dataset = pd.DataFrame()
     encodage = pd.DataFrame()
-    lr0 = []
-    lr1 = []
-    lr2 = []
-    lr3 = []
+    thetas = np.array([])
+    lr = []
