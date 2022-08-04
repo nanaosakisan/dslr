@@ -20,7 +20,7 @@ def count_tp_tn_fp_fn(
 
 
 def accuracy_score_(
-    y: np.ndarray, y_hat: np.ndarray, pos_label: Union[int, str] = 1
+    y: np.ndarray, y_hat: np.ndarray, pos_label: Union[int, str] = 1, eps: float = 1e-15
 ) -> Optional[float]:
     """
     Compute the accuracy score.
@@ -42,7 +42,7 @@ def accuracy_score_(
     ):
         return None
     tp, tn, fp, fn = count_tp_tn_fp_fn(y, y_hat, pos_label)
-    return (tp + tn) / (tp + fp + tn + fn)
+    return (tp + tn) / (tp + fp + tn + fn + eps)
 
 
 def precision_score_(
@@ -73,7 +73,7 @@ def precision_score_(
 
 
 def recall_score_(
-    y: np.ndarray, y_hat: np.ndarray, pos_label: Union[int, str] = 1
+    y: np.ndarray, y_hat: np.ndarray, pos_label: Union[int, str] = 1, eps: float = 1e-15
 ) -> Optional[float]:
     """
     Compute the recall score.
@@ -96,7 +96,7 @@ def recall_score_(
     ):
         return None
     tp, tn, fp, fn = count_tp_tn_fp_fn(y, y_hat, pos_label)
-    return tp / (tp + fn)
+    return tp / (tp + fn + eps)
 
 
 def f1_score_(

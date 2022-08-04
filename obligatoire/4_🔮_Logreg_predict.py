@@ -38,15 +38,17 @@ def get_dataset() -> pd.DataFrame:
     data = pd.read_csv(
         io.StringIO(dataset_filename.read().decode("utf-8")), delimiter=",", index_col=0
     )
-    # if type(data["Hogwarts House"][0]) == str:
-    #     return pd.DataFrame()
-
-    # data["Hogwarts House"] = data["Hogwarts House"].astype(str)
-    # data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
-    # true_schema = pd.read_json("./utils/schema.json")
-    # if not data_schema.equals(true_schema):
-    #     return pd.DataFrame
     return data
+
+
+def get_features(dataset: pd.DataFrame, thetas: pd.DataFrame) -> List[str]:
+    col_names = dataset.columns
+    nb_features = thetas.shape[1] - 2
+    features = []
+    for i in range(nb_features):
+        feature_name = st.selectbox("Feature " + str(i), col_names)
+        features.append(feature_name)
+    return features
 
 
 def prediction_(
@@ -67,16 +69,6 @@ def save_house(pred_decode: np.ndarray):
     save_pred = pd.DataFrame(pred_decode, columns=["Hogwarts House"])
     save_pred.index.name = "Index"
     save_pred.to_csv("./houses.csv", sep=",")
-
-
-def get_features(dataset: pd.DataFrame, thetas: pd.DataFrame) -> List[str]:
-    col_names = dataset.columns
-    nb_features = thetas.shape[1] - 2
-    features = []
-    for i in range(nb_features):
-        feature_name = st.selectbox("Feature " + str(i), col_names)
-        features.append(feature_name)
-    return features
 
 
 def logreg_predict(thetas_filename: str) -> None:
