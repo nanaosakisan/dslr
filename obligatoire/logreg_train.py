@@ -72,7 +72,7 @@ def uni_train(
         alpha = 10**alpha_power
         thetas = np.zeros((X_train.shape[1] + 1, 1))
         lr = MyLogReg(thetas, alpha=alpha, max_iter=100)
-        for iter in range(5):
+        for iter in range(500):
             lr.fit_(X_train, Y_train_feature)
             pred = np.where(lr.predict_(X_test) > 0.5, 1, 0)
             f1_score = f1_score_(Y_test_feature, pred)
@@ -106,8 +106,8 @@ def save_theta(best_model: pd.DataFrame, encodage: pd.DataFrame) -> None:
     for l in best_model:
         thetas = list(l["lr"].thetas.flatten())
         save.append(thetas)
-    pd.DataFrame(save).to_csv("./thetas.csv", sep=";")
-    pd.DataFrame(encodage).to_csv("./thetas.csv", sep=";")
+    pd.DataFrame(save).to_csv("./obligatoire/thetas.csv", sep=";")
+    pd.DataFrame(encodage).to_csv("./obligatoire/encodage.csv", sep=";")
     print("Save thetas and encodage : ok")
 
 
@@ -133,12 +133,12 @@ def main():
     parser = argparse.ArgumentParser(
         description="Process some informations on the features of the dataset"
     )
-    parser.add_argument("filename", type=str, help="Name of the train dataset")
+    parser.add_argument("dataset", type=str, help="Name of the train dataset")
     args = parser.parse_args()
-    if Path(args.filename).suffix != ".csv":
+    if Path(args.dataset).suffix != ".csv":
         print("Please upload a csv file.")
         return
-    data = pd.read_csv("./datasets/dataset_train.csv")
+    data = pd.read_csv(args.dataset)
     if check_features(data.columns.to_list()) == False:
         print(f"Please upload a valid dataset with at least features : {FEATURES}")
     print(f"Dataset\n{data}")

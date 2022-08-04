@@ -176,12 +176,12 @@ def main():
     parser = argparse.ArgumentParser(
         description="Process some informations on the features of the dataset"
     )
-    parser.add_argument("filename", type=str, help="Name of the train dataset")
+    parser.add_argument("dataset", type=str, help="Name of the train dataset")
     args = parser.parse_args()
-    if Path(args.filename).suffix != ".csv":
+    if Path(args.dataset).suffix != ".csv":
         print("Please upload a csv file.")
         return
-    data = pd.read_csv("./datasets/dataset_train.csv")
+    data = pd.read_csv(args.dataset)
     print(f"Dataset\n{data}")
     des_num, des_cat = describe(data)
     print(f"Describe\nNumerical features\n{des_num}\nCategorical features\n{des_cat}")

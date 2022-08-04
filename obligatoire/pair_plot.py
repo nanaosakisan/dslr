@@ -42,12 +42,12 @@ def main():
     parser = argparse.ArgumentParser(
         description="Process some informations on the features of the dataset"
     )
-    parser.add_argument("filename", type=str, help="Name of the train dataset")
+    parser.add_argument("dataset", type=str, help="Name of the train dataset")
     args = parser.parse_args()
-    if Path(args.filename).suffix != ".csv":
+    if Path(args.dataset).suffix != ".csv":
         print("Please upload a csv file.")
         return
-    data = pd.read_csv("./datasets/dataset_train.csv")
+    data = pd.read_csv(args.dataset)
     if check_features(data.columns.to_list()) == False:
         print(f"Please upload a valid dataset with at least features : {FEATURES}")
     print(f"Dataset\n{data}")
