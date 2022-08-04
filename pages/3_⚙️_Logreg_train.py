@@ -64,7 +64,7 @@ def uni_train(
         alpha = 10**alpha_power
         thetas = np.zeros((X_train.shape[1] + 1, 1))
         lr = MyLogReg(thetas, alpha=alpha, max_iter=100)
-        for iter in range(5):
+        for iter in range(500):
             lr.fit_(X_train, Y_train_feature)
             pred = np.where(lr.predict_(X_test) > 0.5, 1, 0)
             f1_score = f1_score_(Y_test_feature, pred)

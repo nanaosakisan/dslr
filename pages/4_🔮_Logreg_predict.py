@@ -14,15 +14,18 @@ def predict(data: np.ndarray, thetas: np.ndarray) -> np.ndarray:
     for t in thetas:
         logreg.append(MyLogReg(thetas=t.reshape(-1, 1)))
 
-    y0 = np.array(logreg[0].predict_(data))
-    y1 = logreg[1].predict_(data)
-    y_pred = np.concatenate((y0, y1), axis=1)
-    y2 = logreg[2].predict_(data)
-    y_pred = np.concatenate((y_pred, y2), axis=1)
-    y3 = logreg[3].predict_(data)
-    y_pred = np.concatenate((y_pred, y3), axis=1)
-    y_pred = np.argmax(y_pred, axis=1)
-    return y_pred
+    y_pred = np.zeros((data.shape[0], 0), float)
+    for l in logreg:
+        y_tmp = l.predict_(data)
+        y_pred = np.column_stack([y_pred, y_tmp])
+        # y0 = np.array(logreg[0].predict_(data))
+        # y1 = logreg[1].predict_(data)
+        # y_pred = np.concatenate((y0, y1), axis=1)
+        # y2 = logreg[2].predict_(data)
+        # y_pred = np.concatenate((y_pred, y2), axis=1)
+        # y3 = logreg[3].predict_(data)
+        # y_pred = np.concatenate((y_pred, y3), axis=1)
+    return np.argmax(y_pred, axis=1)
 
 
 def get_thetas(filename: str) -> Optional[pd.DataFrame]:
