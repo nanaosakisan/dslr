@@ -1,25 +1,7 @@
-from email.policy import default
-from http.cookiejar import DefaultCookiePolicy
 import plotly.express as px
 import pandas as pd
 import streamlit as st
 import utils.settings as settings
-
-FEATURES = [
-    "Arithmancy",
-    "Astronomy",
-    "Herbology",
-    "Defense Against the Dark Arts",
-    "Divination",
-    "Muggle Studies",
-    "Ancient Runes",
-    "History of Magic",
-    "Transfiguration",
-    "Potions",
-    "Care of Magical Creatures",
-    "Charms",
-    "Flying",
-]
 
 
 def histogram(dataset: pd.DataFrame) -> None:

@@ -1,9 +1,9 @@
-import streamlit as st
 import pandas as pd
 import math
+import argparse
 from typing import Tuple, Optional
+from pathlib import Path
 
-import utils.settings as settings
 
 NUM_DES = [
     "Feature",
@@ -172,13 +172,19 @@ def describe(dataset: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     ).drop(df_cat.index[0])
 
 
-st.title("Describe")
-data = settings.dataset
-if data.size == 0:
-    st.info("Please upload a file.")
-else:
+def main():
+    parser = argparse.ArgumentParser(
+        description="Process some informations on the features of the dataset"
+    )
+    parser.add_argument("filename", type=str, help="Name of the train dataset")
+    args = parser.parse_args()
+    if Path(args.filename).suffix != ".csv":
+        print("Please upload a csv file.")
+        return
+    data = pd.read_csv("./datasets/dataset_train.csv")
+    print(f"Dataset\n{data}")
     des_num, des_cat = describe(data)
-    st.markdown("### Numerical features")
-    st.dataframe(des_num.astype(str))
-    st.markdown("### Categorical features")
-    st.dataframe(des_cat.astype(str))
+    print(f"Describe\nNumerical features\n{des_num}\nCategorical features\n{des_cat}")
+
+
+main()
