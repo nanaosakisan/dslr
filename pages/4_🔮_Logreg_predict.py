@@ -3,7 +3,7 @@ import numpy as np
 from os.path import exists
 import io
 import streamlit as st
-from typing import Optional
+from typing import Optional, List
 
 import utils.settings as settings
 from utils.my_logistic_regression import MyLogisticRegression as MyLogReg
@@ -18,13 +18,6 @@ def predict(data: np.ndarray, thetas: np.ndarray) -> np.ndarray:
     for l in logreg:
         y_tmp = l.predict_(data)
         y_pred = np.column_stack([y_pred, y_tmp])
-        # y0 = np.array(logreg[0].predict_(data))
-        # y1 = logreg[1].predict_(data)
-        # y_pred = np.concatenate((y0, y1), axis=1)
-        # y2 = logreg[2].predict_(data)
-        # y_pred = np.concatenate((y_pred, y2), axis=1)
-        # y3 = logreg[3].predict_(data)
-        # y_pred = np.concatenate((y_pred, y3), axis=1)
     return np.argmax(y_pred, axis=1)
 
 
@@ -57,9 +50,9 @@ def get_dataset() -> pd.DataFrame:
 
 
 def prediction_(
-    data: pd.DataFrame, thetas: pd.DataFrame, feature1: str, feature2: str
+    data: pd.DataFrame, thetas: pd.DataFrame, features: List[str]
 ) -> np.ndarray:
-    X = np.array(data[[feature1, feature2]])
+    X = data[features].to_numpy()
     pred = predict(X, thetas.iloc[:, 1:].to_numpy())
     st.markdown("## Predict")
     encodage = settings.encodage
@@ -74,6 +67,16 @@ def save_house(pred_decode: np.ndarray):
     save_pred = pd.DataFrame(pred_decode, columns=["Hogwarts House"])
     save_pred.index.name = "Index"
     save_pred.to_csv("./houses.csv", sep=",")
+
+
+def get_features(dataset: pd.DataFrame, thetas: pd.DataFrame) -> List[str]:
+    col_names = dataset.columns
+    nb_features = thetas.shape[1] - 2
+    features = []
+    for i in range(nb_features):
+        feature_name = st.selectbox("Feature " + str(i), col_names)
+        features.append(feature_name)
+    return features
 
 
 def logreg_predict(thetas_filename: str) -> None:
@@ -94,15 +97,13 @@ def logreg_predict(thetas_filename: str) -> None:
         "The two best features to select are : **Herbology** and **Defense against the dark arts**."
     )
 
-    name = data.columns
-    feature1 = st.selectbox("Feature 1:", name)
-    feature2 = st.selectbox("Feature 2:", name)
+    features = get_features(data, thetas)
     validate_button = st.button("Validate")
-    if feature1 == feature2 or validate_button == False:
-        st.info("Please select differents features and click the validate button.")
+    if validate_button == False:
+        st.info("Please select features and click the validate button.")
         return
 
-    pred_decode = prediction_(data, thetas, feature1, feature2)
+    pred_decode = prediction_(data, thetas, features)
     if pred_decode is None:
         return
     st.dataframe(pred_decode)

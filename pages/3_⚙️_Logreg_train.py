@@ -1,4 +1,3 @@
-from base64 import encode
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -28,14 +27,29 @@ def timeit(method):
     return timed
 
 
-def preprocessing_(
-    dataset: pd.DataFrame, feature1: str, feature2: str, predict_value: str
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    dataset = dataset[[predict_value, feature1, feature2]].dropna()
-    st.dataframe(dataset)
-    dataset = np.array(dataset[[predict_value, feature1, feature2]].dropna())
+def get_features(dataset: pd.DataFrame) -> List[str]:
+    col_names = dataset.columns
+    nb_features = st.number_input(
+        "Nb of features", min_value=2, max_value=len(col_names), value=2
+    )
 
-    X = np.array(dataset[:, [1, 2]], dtype=np.float)
+    features = []
+    for i in range(nb_features):
+        feature_name = st.selectbox("Feature " + str(i), col_names)
+        features.append(feature_name)
+    return features
+
+
+def preprocessing_(
+    dataset: pd.DataFrame, features: List[str], predict_value: str
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    select_col = features.copy()
+    select_col.insert(0, predict_value)
+    dataset = dataset[select_col].dropna()
+    st.dataframe(dataset)
+    dataset = dataset.to_numpy()
+
+    X = np.array(dataset[:, 1:], dtype=float)
     Y = dataset[:, 0]
     encodage, Y_encode = np.unique(Y, return_inverse=True)
     settings.encodage = encodage
@@ -64,7 +78,7 @@ def uni_train(
         alpha = 10**alpha_power
         thetas = np.zeros((X_train.shape[1] + 1, 1))
         lr = MyLogReg(thetas, alpha=alpha, max_iter=100)
-        for iter in range(500):
+        for iter in range(5):
             lr.fit_(X_train, Y_train_feature)
             pred = np.where(lr.predict_(X_test) > 0.5, 1, 0)
             f1_score = f1_score_(Y_test_feature, pred)
@@ -122,16 +136,16 @@ def logreg_train(dataset: pd.DataFrame, **kwargs):
     st.markdown(
         "The two best features to select are : **Herbology** and **Defense against the dark arts**."
     )
-    feature1 = st.selectbox("Feature 1:", name)
-    feature2 = st.selectbox("Feature 2:", name)
+    features = get_features(data)
     predict_value = st.selectbox("Value to predict:", name, index=0)
     validate_button = st.button("Validate")
-    if feature1 == feature2 or validate_button == False:
-        st.info("Please select differents features and click the validate button.")
+    st.write(features)
+    if validate_button == False:
+        st.info("Please select features and click the validate button.")
     else:
         st.markdown("### Train")
         X_train, X_test, Y_train, Y_test = preprocessing_(
-            dataset, feature1, feature2, predict_value
+            dataset, features, predict_value
         )
         lr = fit_(X_train, X_test, Y_train, Y_test)
         best_model = select_best(lr)
