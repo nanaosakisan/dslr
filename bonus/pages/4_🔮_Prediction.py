@@ -9,6 +9,17 @@ import utils.settings as settings
 from utils.my_logistic_regression import MyLogisticRegression as MyLogReg
 
 
+def read_files(filename) -> pd.DataFrame:
+    try:
+        data = pd.read_csv(
+            io.StringIO(filename.read().decode("utf-8")), delimiter=",", index_col=0
+        )
+    except Exception as e:
+        st.error(f"{e.__class__} while reading dataset, please upload a valid file.")
+        return pd.DataFrame()
+    return data
+
+
 def predict(data: np.ndarray, thetas: np.ndarray) -> np.ndarray:
     logreg = []
     for t in thetas:
@@ -19,26 +30,6 @@ def predict(data: np.ndarray, thetas: np.ndarray) -> np.ndarray:
         y_tmp = l.predict_(data)
         y_pred = np.column_stack([y_pred, y_tmp])
     return np.argmax(y_pred, axis=1)
-
-
-def get_thetas(filename: str) -> Optional[pd.DataFrame]:
-    if not exists(filename):
-        st.info("Thetas file doesn't exist. Please run Logreg train.")
-        return
-    thetas = pd.read_csv(filename, sep=";")
-    return thetas
-
-
-def get_dataset() -> pd.DataFrame:
-    dataset_filename = st.file_uploader("Fichier de test :", type="csv")
-    if not dataset_filename:
-        st.info("Please upload a file test.")
-        return
-
-    data = pd.read_csv(
-        io.StringIO(dataset_filename.read().decode("utf-8")), delimiter=",", index_col=0
-    )
-    return data
 
 
 def get_features(dataset: pd.DataFrame, thetas: pd.DataFrame) -> List[str]:
@@ -52,35 +43,35 @@ def get_features(dataset: pd.DataFrame, thetas: pd.DataFrame) -> List[str]:
 
 
 def prediction_(
-    data: pd.DataFrame, thetas: pd.DataFrame, features: List[str]
+    data: pd.DataFrame,
+    thetas: pd.DataFrame,
+    encodage: pd.DataFrame,
+    features: List[str],
 ) -> np.ndarray:
     X = data[features].to_numpy()
     pred = predict(X, thetas.to_numpy())
     st.markdown("## Predict")
-    encodage = settings.encodage
-    if encodage.size == 0:
-        st.info("Encodage setting doesn't exist. Please run Logreg train.")
-        return
     pred_decode = encodage[pred]
     return pred_decode
 
 
 def logreg_predict() -> None:
-    data = get_dataset()
+    filename = st.file_uploader("Fichier de test :", type="csv")
+    data = read_files(filename)
+    if data.size == 0:
+        return
     thetas = settings.thetas
-    if data is None:
+    if thetas.size == 0:
+        st.info("Error while getting thetas, please run Logreg train.")
         return
-    elif data.size == 0:
-        st.error("Error in test dataframe. Please upload a valid dataset.")
+    encodage = settings.encodage
+    if encodage.size == 0:
+        st.info("Error while getting encodage, please run Logreg train.")
         return
-    elif thetas.size == 0:
-        st.info("Thetas empty, please run Logreg train.")
-        return
-
-    st.markdown("#### Thetas")
-    st.write(thetas)
     st.markdown("#### Dataset")
     st.dataframe(data)
+    st.markdown("#### Thetas")
+    st.write(thetas)
     st.markdown("### Prediction")
     st.write(
         "The two best features to select are : **Herbology** and **Defense against the dark arts**."
@@ -93,8 +84,6 @@ def logreg_predict() -> None:
         return
 
     pred_decode = prediction_(data, thetas, features)
-    if pred_decode is None:
-        return
     st.dataframe(pred_decode)
 
 
