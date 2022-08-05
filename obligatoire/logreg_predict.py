@@ -26,38 +26,41 @@ FEATURES = [
 ]
 
 
-def check_features(name_col: list) -> bool:
-    for f in FEATURES:
-        if f not in name_col:
-            return False
-    return True
+def read_files(args) -> pd.DataFrame:
+    try:
+        data = pd.read_csv(args.dataset, index_col=0)
+    except Exception as e:
+        print(
+            f"{e.__class__} while reading the dataset, please upload a valid dataset."
+        )
+        return pd.DataFrame()
+    data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
+    true_schema = pd.read_json("./obligatoire/utils/schema.json")
+    if data_schema.equals(true_schema) != True:
+        print("Schema error, please upload a valid file.")
+        print(f"data_schema\n{data_schema}")
+        print(f"true_schema\n{true_schema}")
+        return pd.DataFrame()
+    return data
 
 
-def read_files(args) -> Tuple[pd.DataFrame]:
-    if Path(args.dataset).suffix != ".csv":
-        print("Please upload a csv file as dataset.")
-        return
-    if Path(args.thetas).suffix != ".csv":
-        print("Please upload a csv file as thetas.")
-        return
-    if Path(args.encodage).suffix != ".csv":
-        print("Please upload a csv file as encodage.")
-        return
-    data = pd.read_csv(args.dataset)
-    if check_features(data.columns.to_list()) == False:
-        print(f"Please upload a valid dataset with at least features : {FEATURES}")
-    thetas = pd.read_csv(args.thetas, sep=";")
-    if thetas.size == 0:
-        print("Please upload a valid thetas files")
-    encodage = pd.read_csv(args.encodage, sep=";")
-    if encodage.size == 0:
-        print("Please upload a valid encodage files")
+def read_files(args) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    try:
+        data = pd.read_csv(args.dataset, index_col=0)
+    except Exception as e:
+        print(f"{e.__class__} while reading dataset, please upload a valid file.")
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+    try:
+        thetas = pd.read_csv(args.thetas, sep=";")
+    except Exception as e:
+        print(f"{e.__class__} while reading thetas, please upload a valid file.")
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+    try:
+        encodage = pd.read_csv(args.encodage, sep=";")
+    except Exception as e:
+        print(f"{e.__class__} while reading encodage, please upload a valid file.")
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     return data, thetas, encodage
-
-
-def predict(data: np.ndarray, thetas: np.ndarray) -> np.ndarray:
-
-    return
 
 
 def save_house(pred_decode: np.ndarray):
@@ -89,13 +92,15 @@ def prediction_(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Process some informations on the features of the dataset"
+        description="Predict the house for student in the dataset"
     )
     parser.add_argument("dataset", type=str, help="Name of the test dataset")
     parser.add_argument("thetas", type=str, help="Name of the thetas file")
     parser.add_argument("encodage", type=str, help="Name of the encodage file")
     args = parser.parse_args()
     data, thetas, encodage = read_files(args)
+    if data.size == 0 or thetas.size == 0 or encodage.size == 0:
+        return
     print(f"Dataset\n{data}")
     print(f"Thetas\n{thetas}")
     pred_decode = prediction_(

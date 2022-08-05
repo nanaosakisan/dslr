@@ -1,10 +1,8 @@
 import argparse
 import pandas as pd
-from pathlib import Path
 import plotly.express as px
 
 FEATURES = [
-    "Hogwarts House",
     "Arithmancy",
     "Astronomy",
     "Herbology",
@@ -21,13 +19,6 @@ FEATURES = [
 ]
 
 
-def check_features(name_col: list) -> bool:
-    for f in FEATURES:
-        if f not in name_col:
-            return False
-    return True
-
-
 def pair_plot(dataset: pd.DataFrame) -> None:
     fig_pair = px.scatter_matrix(
         dataset,
@@ -38,18 +29,31 @@ def pair_plot(dataset: pd.DataFrame) -> None:
     fig_pair.show()
 
 
+def read_files(args) -> pd.DataFrame:
+    try:
+        data = pd.read_csv(args.dataset, index_col=0)
+    except Exception as e:
+        print(f"{e.__class__} while reading dataset, please upload a valid file.")
+        return pd.DataFrame()
+    data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
+    true_schema = pd.read_json("./obligatoire/utils/schema.json")
+    if data_schema.equals(true_schema) != True:
+        print("Schema error, please upload a valid file.")
+        print(f"data_schema\n{data_schema}")
+        print(f"true_schema\n{true_schema}")
+        return pd.DataFrame()
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Process some informations on the features of the dataset"
+        description="Display pair plot with the features of the dataset"
     )
     parser.add_argument("dataset", type=str, help="Name of the train dataset")
     args = parser.parse_args()
-    if Path(args.dataset).suffix != ".csv":
-        print("Please upload a csv file.")
+    data = read_files(args)
+    if data.size == 0:
         return
-    data = pd.read_csv(args.dataset)
-    if check_features(data.columns.to_list()) == False:
-        print(f"Please upload a valid dataset with at least features : {FEATURES}")
     print(f"Dataset\n{data}")
     pair_plot(data)
 

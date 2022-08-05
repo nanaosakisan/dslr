@@ -2,7 +2,6 @@ import pandas as pd
 import math
 import argparse
 from typing import Tuple, Optional
-from pathlib import Path
 
 
 NUM_DES = [
@@ -172,16 +171,31 @@ def describe(dataset: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     ).drop(df_cat.index[0])
 
 
+def read_files(args) -> pd.DataFrame:
+    try:
+        data = pd.read_csv(args.dataset, index_col=0)
+    except Exception as e:
+        print(f"{e.__class__} while reading dataset, please upload a valid file.")
+        return pd.DataFrame()
+    data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
+    true_schema = pd.read_json("./obligatoire/utils/schema.json")
+    if data_schema.equals(true_schema) != True:
+        print("Schema error, please upload a valid file.")
+        print(f"data_schema\n{data_schema}")
+        print(f"true_schema\n{true_schema}")
+        return pd.DataFrame()
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Process some informations on the features of the dataset"
     )
     parser.add_argument("dataset", type=str, help="Name of the train dataset")
     args = parser.parse_args()
-    if Path(args.dataset).suffix != ".csv":
-        print("Please upload a csv file.")
+    data = read_files(args)
+    if data.size == 0:
         return
-    data = pd.read_csv(args.dataset)
     print(f"Dataset\n{data}")
     des_num, des_cat = describe(data)
     print(f"Describe\nNumerical features\n{des_num}\nCategorical features\n{des_cat}")

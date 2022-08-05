@@ -2,36 +2,11 @@ import argparse
 import numpy as np
 import pandas as pd
 from typing import Tuple, List
-from pathlib import Path
 
 from utils.my_logistic_regression import MyLogisticRegression as MyLogReg
 from utils.MinMaxNormalisation import MinMaxNormalisation
 from utils.data_spliter import data_spliter
 from utils.metrics import f1_score_
-
-FEATURES = [
-    "Hogwarts House",
-    "Arithmancy",
-    "Astronomy",
-    "Herbology",
-    "Defense Against the Dark Arts",
-    "Divination",
-    "Muggle Studies",
-    "Ancient Runes",
-    "History of Magic",
-    "Transfiguration",
-    "Potions",
-    "Care of Magical Creatures",
-    "Charms",
-    "Flying",
-]
-
-
-def check_features(name_col: list) -> bool:
-    for f in FEATURES:
-        if f not in name_col:
-            return False
-    return True
 
 
 def preprocessing_(
@@ -40,7 +15,7 @@ def preprocessing_(
     select_col = features.copy()
     select_col.insert(0, predict_value)
     dataset = dataset[select_col].dropna()
-    print(dataset)
+    print(f"Dataset before encodage\n{dataset}")
     dataset = dataset.to_numpy()
 
     X = np.array(dataset[:, 1:], dtype=float)
@@ -129,18 +104,31 @@ def logreg_train(dataset: pd.DataFrame):
     save_theta(best_model, encodage)
 
 
+def read_files(args) -> pd.DataFrame:
+    try:
+        data = pd.read_csv(args.dataset, index_col=0)
+    except Exception as e:
+        print(f"{e.__class__} while reading dataset, please upload a valid file.")
+        return pd.DataFrame()
+    data_schema = pd.DataFrame(pd.io.json.build_table_schema(data).get("fields"))
+    true_schema = pd.read_json("./obligatoire/utils/schema.json")
+    if data_schema.equals(true_schema) != True:
+        print("Schema error, please upload a valid file.")
+        print(f"data_schema\n{data_schema}")
+        print(f"true_schema\n{true_schema}")
+        return pd.DataFrame()
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Process some informations on the features of the dataset"
+        description="Train and select the best models to predict house."
     )
     parser.add_argument("dataset", type=str, help="Name of the train dataset")
     args = parser.parse_args()
-    if Path(args.dataset).suffix != ".csv":
-        print("Please upload a csv file.")
+    data = read_files(args)
+    if data.size == 0:
         return
-    data = pd.read_csv(args.dataset)
-    if check_features(data.columns.to_list()) == False:
-        print(f"Please upload a valid dataset with at least features : {FEATURES}")
     print(f"Dataset\n{data}")
     logreg_train(data)
 
