@@ -54,6 +54,8 @@ def main():
     parser.add_argument("dataset", type=str, help="Name of the train dataset")
     args = parser.parse_args()
     data = read_files(args)
+    if data.size == 0:
+        return
     print(f"Dataset\n{data}")
     histogram(data)
 

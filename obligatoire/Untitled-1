@@ -1,0 +1,2 @@
+python obligatoire/logreg_predict.py obligatoire/thetas.csv  obligatoire/encodage.csv datasets/dataset_test.csv
+-> Mettre un message d'erreur

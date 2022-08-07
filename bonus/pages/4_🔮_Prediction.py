@@ -57,6 +57,9 @@ def prediction_(
 
 def logreg_predict() -> None:
     filename = st.file_uploader("Fichier de test :", type="csv")
+    if filename == None:
+        st.info("Please uploade a test file.")
+        return
     data = read_files(filename)
     if data.size == 0:
         return
@@ -83,7 +86,8 @@ def logreg_predict() -> None:
         st.info("Please select features and click the validate button.")
         return
 
-    pred_decode = prediction_(data, thetas, features)
+    st.write(features)
+    pred_decode = prediction_(data, thetas, encodage, features)
     st.dataframe(pred_decode)
 
 

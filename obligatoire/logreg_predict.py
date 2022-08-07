@@ -96,7 +96,7 @@ def main():
     )
     parser.add_argument("dataset", type=str, help="Name of the test dataset")
     parser.add_argument("thetas", type=str, help="Name of the thetas file")
-    parser.add_argument("encodage", type=str, help="Name of the encodage file")
+    parser.add_argument("--encodage", type=str, help="Name of the encodage file", default="obligatoire/encodage.csv")
     args = parser.parse_args()
     data, thetas, encodage = read_files(args)
     if data.size == 0 or thetas.size == 0 or encodage.size == 0:
