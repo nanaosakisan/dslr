@@ -62,11 +62,14 @@ def uni_train(
     Y_test_feature = np.where(Y_test == feature, 1, 0).reshape(-1, 1)
 
     lr_trained = []
+    progress_bar = st.progress(0)
     for alpha_power in range(-1, -2, -1):
         alpha = 10**alpha_power
         thetas = np.zeros((X_train.shape[1] + 1, 1))
         lr = MyLogReg(thetas, alpha=alpha, max_iter=100)
+        st.write(f"Training model {feature}")
         for iter in range(300):
+            progress_bar.progress(round(iter / 300, 2))
             lr.fit_(X_train, Y_train_feature)
             pred = np.where(lr.predict_(X_test) > 0.5, 1, 0)
             f1_score = f1_score_(Y_test_feature, pred)

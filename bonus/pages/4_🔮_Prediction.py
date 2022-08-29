@@ -86,7 +86,6 @@ def logreg_predict() -> None:
         st.info("Please select features and click the validate button.")
         return
 
-    st.write(features)
     pred_decode = prediction_(data, thetas, encodage, features)
     st.dataframe(pred_decode)
 
